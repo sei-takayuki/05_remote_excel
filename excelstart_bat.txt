@@ -1,0 +1,25 @@
+set RDPFILE=win2012r2-excel.rdp
+set USER=server\excelusr
+set USER2=excelusr
+set PASSWORD=password
+set HOST=win2012r2
+set WORKDIR=C:\TEMP\
+
+
+rem #バックグラウンドでリモートデスクトップ接続をする(要応答無し設定)
+start mstsc %WORKDIR%%RDPFILE%
+
+rem #30secのWAIT
+timeout /T 30
+
+rem #リモードデスクトップを切断(mstscの終了)(要応答無し設定)
+taskkill /IM mstsc.exe
+
+rem #3.psexecでセッションIDを確認する(この場合IDは2)
+psexec -u %USER% -p %PASSWORD%  \\%HOST% qwinsta | findstr /I %USER2% >%WORKDIR%IDGYOU.txt
+powershell %WORKDIR%IDGET.ps1
+for /F "usebackq" %%i in (`powershell %WORKDIR%IDGET.ps1`) do (  set IDNO=%%i)
+
+rem #psexecでセッションIDを指定してExcelViewerを起動
+psexec -i %IDNO% -d -u %USER% -p %PASSWORD% \\%HOST% "C:\Program Files (x86)\Microsoft Office\Office12\XLVIEW.EXE"
+

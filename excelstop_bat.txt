@@ -1,0 +1,20 @@
+set USER=server\excelusr
+set USER2=excelusr
+set PASSWORD=password
+set HOST=win2012r2
+set WORKDIR=C:\TEMP\
+
+
+rem #3.psexecでセッションIDを確認する(この場合IDは2)
+psexec -u %USER% -p %PASSWORD%  \\%HOST% qwinsta | findstr /I %USER2% >%WORKDIR%IDGYOU.txt
+powershell %WORKDIR%IDGET.ps1
+for /F "usebackq" %%i in (`powershell %WORKDIR%IDGET.ps1`) do (  set IDNO=%%i)
+
+rem #psexecでセッションIDを指定してExcelViewerの閉じるボタンを押す
+psexec -i %IDNO% -d -u %USER% -p %PASSWORD% \\%HOST% powershell -Command "(Get-Process XLVIEW).CloseMainWindow()"
+
+rem #psexecでセッションIDを指定してExcelViewerを強制停止
+psexec -i %IDNO% -d -u %USER% -p %PASSWORD% \\%HOST% powershell -Command "Stop-process -name XLVIEW"
+
+rem #psexecでセッションIDを指定してログオフ
+psexec -i %IDNO% -d -u %USER% -p %PASSWORD% \\%HOST% logoff

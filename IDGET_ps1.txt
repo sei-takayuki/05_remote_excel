@@ -1,0 +1,3 @@
+$IDGYOU = (Get-Content C:\TEMP\IDGYOU.txt)
+-split $IDGYOU > C:\TEMP\IDGYOU2.txt
+(Get-Content C:\TEMP\IDGYOU2.txt)[1..1]
